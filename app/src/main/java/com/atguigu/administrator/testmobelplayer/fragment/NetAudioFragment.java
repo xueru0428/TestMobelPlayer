@@ -68,6 +68,9 @@ public class NetAudioFragment extends BaseFragment {
 
     }
 
+
+
+
     private void getDataFromNet() {
         RequestParams reques = new RequestParams(Constant.NET_AUDIO_URL);
         x.http().get(reques, new Callback.CommonCallback<String>() {
