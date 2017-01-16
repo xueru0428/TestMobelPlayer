@@ -56,7 +56,7 @@ public class NetAudioFragment extends BaseFragment {
         Log.e("TAG", "网络音频ui初始化了");
         View view = View.inflate(mContext, R.layout.fragment_net_audio, null);
         ButterKnife.bind(this, view);
-//设置监听
+        //设置监听
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
