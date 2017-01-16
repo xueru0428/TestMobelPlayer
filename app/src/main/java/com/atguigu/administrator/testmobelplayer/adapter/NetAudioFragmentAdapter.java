@@ -303,13 +303,6 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
         }
     }
 
-
-
-
-
-
-
-
     class BaseViewHolder {
 
         ImageView ivHeadpic;
