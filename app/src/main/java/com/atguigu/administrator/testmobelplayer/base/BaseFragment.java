@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 public abstract class BaseFragment extends Fragment {
 
-    public Context mContent;
+    public Context mContext;
 
     /**
      * 当系统创建前BaseFragment类的时候回调该方法
@@ -23,7 +23,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mContent = getActivity();
+        mContext = getActivity();
     }
 
     /**
