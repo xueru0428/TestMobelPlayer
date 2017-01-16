@@ -16,6 +16,8 @@ import com.atguigu.administrator.testmobelplayer.base.BaseFragment;
 import com.atguigu.administrator.testmobelplayer.bean.NetAudioBean;
 import com.atguigu.administrator.testmobelplayer.utils.CacheUtils;
 import com.atguigu.administrator.testmobelplayer.utils.Constant;
+import com.cjj.MaterialRefreshLayout;
+import com.cjj.MaterialRefreshListener;
 import com.google.gson.Gson;
 
 import org.xutils.common.Callback;
@@ -45,6 +47,8 @@ public class NetAudioFragment extends BaseFragment {
     TextView tvNomedia;
     private NetAudioFragmentAdapter myAdapter;
     private List<NetAudioBean.ListBean> datas;
+    @Bind(R.id.refresh)
+    MaterialRefreshLayout refreshLayout;
 
 
     @Override
@@ -77,8 +81,26 @@ public class NetAudioFragment extends BaseFragment {
             }
         });
 
+        refreshLayout.setMaterialRefreshListener(new MyMaterialRefreshListener());
         return view;
 
+    }
+
+    private boolean isLoadMore = false;
+    class MyMaterialRefreshListener extends MaterialRefreshListener {
+
+        @Override
+        public void onRefresh(MaterialRefreshLayout materialRefreshLayout) {
+            isLoadMore = false;
+            getDataFromNet();
+        }
+
+        @Override
+        public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout) {
+            super.onRefreshLoadMore(materialRefreshLayout);
+            isLoadMore = true;
+            getDataFromNet();
+        }
     }
 
     @Override
@@ -106,6 +128,13 @@ public class NetAudioFragment extends BaseFragment {
                 CacheUtils.putString(mContext, Constant.NET_AUDIO_URL, result);
                 LogUtil.e("onSuccess==" + result);
                 processData(result);
+                if(!isLoadMore){
+                    //完成刷新
+                    refreshLayout.finishRefresh();
+                }else {
+                    //把上拉刷新隐藏
+                    refreshLayout.finishRefreshLoadMore();
+                }
             }
 
             @Override
@@ -138,20 +167,28 @@ public class NetAudioFragment extends BaseFragment {
 
 
     private void processData(String result) {
-        NetAudioBean netAudioBean = paraseJson(result);
-        LogUtil.e(netAudioBean.getList().get(0).getText() + "-----------");
+        if(!isLoadMore) {
+            NetAudioBean netAudioBean = paraseJson(result);
+            LogUtil.e(netAudioBean.getList().get(0).getText() + "-----------");
 
-        datas = netAudioBean.getList();
+            datas = netAudioBean.getList();
 
-        if (datas != null && datas.size() > 0) {
-            //有视频
-            tvNomedia.setVisibility(View.GONE);
-            //设置适配器
-            myAdapter = new NetAudioFragmentAdapter(mContext, datas);
-            listview.setAdapter(myAdapter);
-        } else {
-            //没有视频
-            tvNomedia.setVisibility(View.VISIBLE);
+            if (datas != null && datas.size() > 0) {
+                //有视频
+                tvNomedia.setVisibility(View.GONE);
+                //设置适配器
+                myAdapter = new NetAudioFragmentAdapter(mContext, datas);
+                listview.setAdapter(myAdapter);
+            } else {
+                //没有视频
+                tvNomedia.setVisibility(View.VISIBLE);
+            }
+        }else {
+            //加载更多
+            NetAudioBean netAudioBean = paraseJson(result);
+            datas.addAll( netAudioBean.getList());
+            //刷新适配器
+            myAdapter.notifyDataSetChanged();
         }
 
         progressbar.setVisibility(View.GONE);
